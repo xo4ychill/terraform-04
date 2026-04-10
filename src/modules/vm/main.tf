@@ -4,12 +4,12 @@ data "yandex_compute_image" "develop" {
 
 resource "yandex_compute_instance" "develop" {
   name        = var.vm_name
-  platform_id = "standard-v2"
+  platform_id = "standard-v3"
   zone        = var.zone
 
   resources {
     cores         = 2
-    memory        = 2
+    memory        = 1
     core_fraction = 20
   }
 
@@ -28,6 +28,8 @@ resource "yandex_compute_instance" "develop" {
 
   metadata = {
     user-data = var.cloud_init_content
+    serial-port-enable = "1"
+    ssh-keys           = "yc-user:${var.ssh_public_key}"
   }
 
   labels = {
@@ -38,4 +40,7 @@ resource "yandex_compute_instance" "develop" {
   scheduling_policy {
     preemptible = var.preemptible
   }
+
+  allow_stopping_for_update = true
+
 }

@@ -1,4 +1,5 @@
 #cloud-config
+
 users:
   - name: yc-user
     groups: sudo
@@ -6,6 +7,7 @@ users:
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     ssh_authorized_keys:
       - ${ssh_key}
+
 
 package_update: true
 

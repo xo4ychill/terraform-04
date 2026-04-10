@@ -33,7 +33,7 @@ variable "ssh_public_key" {
 variable "image_family" {
   description = "Семейство образа ОС"
   type        = string
-  default     = "ubuntu-2004-lts"
+  default     = "ubuntu-2204-lts"
 }
 
 variable "subnet_name" {

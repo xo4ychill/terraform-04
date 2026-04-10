@@ -40,8 +40,10 @@ resource "yandex_vpc_subnet" "develop" {
 
 # Генерация cloud-init с подстановкой SSH-ключа
 locals {
-  cloud_init_content = templatefile("${path.module}/cloud-init.yml.tpl", {
-    ssh_key = var.ssh_public_key
+  ssh_key_content = file(pathexpand(var.ssh_public_key))
+  cloud_init_content = templatefile("${path.module}/cloud-init.yml.tpl", 
+  {
+    ssh_key = local.ssh_key_content
   })
 }
 
@@ -55,6 +57,7 @@ module "marketing_vm" {
   cloud_init_content = local.cloud_init_content
   zone          = var.default_zone
   image_family  = var.image_family
+  ssh_public_key = local.ssh_key_content
   preemptible   = true
 }
 
@@ -68,5 +71,6 @@ module "analytics_vm" {
   cloud_init_content = local.cloud_init_content
   zone          = var.default_zone
   image_family  = var.image_family
+  ssh_public_key = local.ssh_key_content
   preemptible   = true
 }
