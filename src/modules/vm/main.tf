@@ -1,20 +1,41 @@
-resource "yandex_compute_instance" "this" {
-  name        = var.name
-  platform_id = var.platform_id
+data "yandex_compute_image" "develop" {
+  family = var.image_family
+}
+
+resource "yandex_compute_instance" "develop" {
+  name        = var.vm_name
+  platform_id = "standard-v2"
+  zone        = var.zone
+
   resources {
-    cores  = var.resources.cores
-    memory = var.resources.memory
+    cores         = 2
+    memory        = 2
+    core_fraction = 20
   }
+
   boot_disk {
     initialize_params {
-      image_id = var.image_id
+      image_id = data.yandex_compute_image.develop.id
+      size     = 10
+      type     = "network-hdd"
     }
   }
+
   network_interface {
     subnet_id = var.subnet_id
     nat       = true
   }
-  metadata    = var.metadata
-  labels      = var.labels
-  preemptible = var.preemptible
+
+  metadata = {
+    user-data = var.cloud_init_content
+  }
+
+  labels = {
+    project = var.project_label
+    env     = "test"
+  }
+
+  scheduling_policy {
+    preemptible = var.preemptible
+  }
 }

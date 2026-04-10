@@ -1,22 +1,9 @@
-variable "name" {}
-variable "platform_id" {}
-variable "resources" {
-  type = object({
-    cores  = number
-    memory = number
-  })
-}
-variable "image_id" {}
+variable "vm_name" {}
+variable "project_label" {}
 variable "subnet_id" {}
-variable "metadata" {
-  type    = map(string)
-  default = {}
-}
-variable "labels" {
-  type    = map(string)
-  default = {}
-}
+variable "cloud_init_content" {}
+variable "zone" {}
+variable "image_family" {}
 variable "preemptible" {
-  type    = bool
-  default = false
+  default = true
 }

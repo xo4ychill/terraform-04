@@ -1,9 +1,3 @@
-variable "token" {
-  description = "OAuth-токен Yandex Cloud"
-  type        = string
-  sensitive   = true
-}
-
 variable "cloud_id" {
   description = "ID облака Yandex Cloud"
   type        = string
@@ -14,10 +8,20 @@ variable "folder_id" {
   type        = string
 }
 
-variable "zone" {
+variable "default_zone" {
   description = "Зона доступности"
   type        = string
   default     = "ru-central1-a"
+}
+
+variable "vpc_name" {
+  type        = string
+  default     = "develop"
+  description = "VPC network&subnet name"
+}
+
+variable "service_account_key_file" {
+  type = string
 }
 
 variable "ssh_public_key" {
@@ -35,5 +39,5 @@ variable "image_family" {
 variable "subnet_name" {
   description = "Имя подсети (должна существовать)"
   type        = string
-  default     = "default"
+  default     = "develop"
 }

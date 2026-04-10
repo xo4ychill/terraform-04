@@ -1,8 +1,6 @@
 output "vm_ips" {
-
   value = {
-    for k, vm in module.vm :
-    k => vm.external_ip
+    marketing  = module.marketing_vm.external_ip
+    analytics  = module.analytics_vm.external_ip
   }
-
 }

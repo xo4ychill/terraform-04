@@ -1,73 +1,72 @@
 terraform {
-  required_version = "~> 1.12.0"
+  required_version = ">= 1.12.0"
   required_providers {
     yandex = {
       source  = "yandex-cloud/yandex"
-      version = "~> 0.97"
     }
   }
 }
 
 provider "yandex" {
-  token     = var.token
   cloud_id  = var.cloud_id
   folder_id = var.folder_id
-  zone      = var.zone
+  zone      = var.default_zone
+  service_account_key_file = pathexpand(var.service_account_key_file)
 }
 
-data "yandex_compute_image" "ubuntu" {
-  family = var.image_family
+/*
+# Получаем существующую VPC и подсеть по именам
+data "yandex_vpc_network" "develop" {
+  name = var.vpc_name
 }
 
-data "yandex_vpc_subnet" "default" {
+data "yandex_vpc_subnet" "develop" {
   name = var.subnet_name
 }
+*/
 
-# Генерация cloud-init из шаблона
+# Создаём сеть
+resource "yandex_vpc_network" "develop" {
+  name = var.vpc_name
+}
+
+# Создаём подсеть
+resource "yandex_vpc_subnet" "develop" {
+  name           = var.subnet_name
+  zone           = var.default_zone
+  network_id     = yandex_vpc_network.develop.id
+  v4_cidr_blocks = ["10.0.1.0/24"]
+}
+
+# Генерация cloud-init с подстановкой SSH-ключа
 locals {
   cloud_init_content = templatefile("${path.module}/cloud-init.yml.tpl", {
-    ssh_public_key = var.ssh_public_key
+    ssh_key = var.ssh_public_key
   })
 }
 
-# Модуль для ВМ marketing (первый вызов)
+# Локальный модуль для ВМ marketing
 module "marketing_vm" {
-  source = "./modules/vm"   # или remote-модуль, но без provider внутри
+  source = "./modules/vm"
 
-  name        = "marketing-vm"
-  platform_id = "standard-v1"
-  resources = {
-    cores  = 2
-    memory = 2
-  }
-  image_id    = data.yandex_compute_image.ubuntu.id
-  subnet_id   = data.yandex_vpc_subnet.default.id
-  preemptible = true
-  metadata = {
-    user-data = local.cloud_init_content
-  }
-  labels = {
-    project = "marketing"
-  }
+  vm_name       = "vm-marketing"
+  project_label = "marketing"
+  subnet_id     = yandex_vpc_subnet.develop.id
+  cloud_init_content = local.cloud_init_content
+  zone          = var.default_zone
+  image_family  = var.image_family
+  preemptible   = true
 }
 
-# Модуль для ВМ analytics (второй вызов)
+# Локальный модуль для ВМ analytics
 module "analytics_vm" {
   source = "./modules/vm"
 
-  name        = "analytics-vm"
-  platform_id = "standard-v1"
-  resources = {
-    cores  = 2
-    memory = 2
-  }
-  image_id    = data.yandex_compute_image.ubuntu.id
-  subnet_id   = data.yandex_vpc_subnet.default.id
-  preemptible = true
-  metadata = {
-    user-data = local.cloud_init_content
-  }
-  labels = {
-    project = "analytics"
-  }
+  vm_name       = "vm-analytics"
+  project_label = "analytics"
+  subnet_id     = yandex_vpc_subnet.develop.id
+  cloud_init_content = local.cloud_init_content
+  zone          = var.default_zone
+  image_family  = var.image_family
+  preemptible   = true
 }
