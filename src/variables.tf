@@ -33,25 +33,38 @@ variable "vpc_name" {
 
 ###common vars
 
+variable "service_account_key_file" {
+  type = string
+}
+
 variable "vms_ssh_root_key" {
   type        = string
-  default     = "your_ssh_ed25519_key"
-  description = "ssh-keygen -t ed25519"
+  description = "SSH public key"
 }
 
-###example vm_web var
-variable "vm_web_name" {
-  type        = string
-  default     = "netology-develop-platform-web"
-  description = "example vm_web_ prefix"
+variable "vm_resources" {
+  description = "VM resource configuration"
+
+  type = map(object({
+    cores         = number
+    memory        = number
+    core_fraction = number
+    disk_size     = number
+  }))
+
+  default = {
+    marketing = {
+      cores         = 2
+      memory        = 2
+      core_fraction = 20
+      disk_size     = 10
+    }
+
+    analytics = {
+      cores         = 2
+      memory        = 2
+      core_fraction = 20
+      disk_size     = 10
+    }
+  }
 }
-
-###example vm_db var
-variable "vm_db_name" {
-  type        = string
-  default     = "netology-develop-platform-db"
-  description = "example vm_db_ prefix"
-}
-
-
-
