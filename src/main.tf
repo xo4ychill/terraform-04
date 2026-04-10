@@ -26,15 +26,13 @@ data "yandex_vpc_subnet" "develop" {
 */
 
 # Создаём сеть
-resource "yandex_vpc_network" "develop" {
-  name = var.vpc_name
-}
+# Модуль VPC
+module "vpc" {
+  source = "./modules/vpc"
 
-# Создаём подсеть
-resource "yandex_vpc_subnet" "develop" {
-  name           = var.subnet_name
+  network_name   = var.vpc_name
+  subnet_name    = var.subnet_name
   zone           = var.default_zone
-  network_id     = yandex_vpc_network.develop.id
   v4_cidr_blocks = ["10.0.1.0/24"]
 }
 
@@ -53,7 +51,7 @@ module "marketing_vm" {
 
   vm_name       = "vm-marketing"
   project_label = "marketing"
-  subnet_id     = yandex_vpc_subnet.develop.id
+  subnet_id     = module.vpc.subnet_id
   cloud_init_content = local.cloud_init_content
   zone          = var.default_zone
   image_family  = var.image_family
@@ -67,7 +65,7 @@ module "analytics_vm" {
 
   vm_name       = "vm-analytics"
   project_label = "analytics"
-  subnet_id     = yandex_vpc_subnet.develop.id
+  subnet_id     = module.vpc.subnet_id
   cloud_init_content = local.cloud_init_content
   zone          = var.default_zone
   image_family  = var.image_family
