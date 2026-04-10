@@ -1,35 +1,22 @@
-variable "vm_name" {
-  type = string
+variable "name" {}
+variable "platform_id" {}
+variable "resources" {
+  type = object({
+    cores  = number
+    memory = number
+  })
 }
-
+variable "image_id" {}
+variable "subnet_id" {}
+variable "metadata" {
+  type    = map(string)
+  default = {}
+}
 variable "labels" {
-  type = map(string)
+  type    = map(string)
+  default = {}
 }
-
-variable "zone" {
-  type = string
-}
-
-variable "subnet_id" {
-  type = string
-}
-
-variable "cores" {
-  type = number
-}
-
-variable "memory" {
-  type = number
-}
-
-variable "core_fraction" {
-  type = number
-}
-
-variable "disk_size" {
-  type = number
-}
-
-variable "user_data" {
-  type = string
+variable "preemptible" {
+  type    = bool
+  default = false
 }

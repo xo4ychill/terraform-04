@@ -1,32 +1,73 @@
-resource "yandex_vpc_network" "develop" {
-  name = var.vpc_name
-}
-resource "yandex_vpc_subnet" "develop" {
-  name           = var.vpc_name
-  zone           = var.default_zone
-  network_id     = yandex_vpc_network.develop.id
-  v4_cidr_blocks = var.default_cidr
+terraform {
+  required_version = "~> 1.12.0"
+  required_providers {
+    yandex = {
+      source  = "yandex-cloud/yandex"
+      version = "~> 0.97"
+    }
+  }
 }
 
-module "vm" {
+provider "yandex" {
+  token     = var.token
+  cloud_id  = var.cloud_id
+  folder_id = var.folder_id
+  zone      = var.zone
+}
 
+data "yandex_compute_image" "ubuntu" {
+  family = var.image_family
+}
+
+data "yandex_vpc_subnet" "default" {
+  name = var.subnet_name
+}
+
+# Генерация cloud-init из шаблона
+locals {
+  cloud_init_content = templatefile("${path.module}/cloud-init.yml.tpl", {
+    ssh_public_key = var.ssh_public_key
+  })
+}
+
+# Модуль для ВМ marketing (первый вызов)
+module "marketing_vm" {
+  source = "./modules/vm"   # или remote-модуль, но без provider внутри
+
+  name        = "marketing-vm"
+  platform_id = "standard-v1"
+  resources = {
+    cores  = 2
+    memory = 2
+  }
+  image_id    = data.yandex_compute_image.ubuntu.id
+  subnet_id   = data.yandex_vpc_subnet.default.id
+  preemptible = true
+  metadata = {
+    user-data = local.cloud_init_content
+  }
+  labels = {
+    project = "marketing"
+  }
+}
+
+# Модуль для ВМ analytics (второй вызов)
+module "analytics_vm" {
   source = "./modules/vm"
 
-  for_each = local.vm_config
-
-  vm_name  = each.value.name
-  labels   = each.value.labels
-  zone     = var.default_zone
-
-  subnet_id = yandex_vpc_subnet.develop.id
-
-  cores         = var.vm_resources[each.key].cores
-  memory        = var.vm_resources[each.key].memory
-  core_fraction = var.vm_resources[each.key].core_fraction
-  disk_size     = var.vm_resources[each.key].disk_size
-
-  user_data = templatefile("${path.module}/templates/cloud-init.yml.tftpl", {
-    ssh_key = var.vms_ssh_root_key
-  })
-
+  name        = "analytics-vm"
+  platform_id = "standard-v1"
+  resources = {
+    cores  = 2
+    memory = 2
+  }
+  image_id    = data.yandex_compute_image.ubuntu.id
+  subnet_id   = data.yandex_vpc_subnet.default.id
+  preemptible = true
+  metadata = {
+    user-data = local.cloud_init_content
+  }
+  labels = {
+    project = "analytics"
+  }
 }

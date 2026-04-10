@@ -1,36 +1,20 @@
-resource "yandex_compute_instance" "vm" {
-
-  name = var.vm_name
-  zone = var.zone
-
-  labels = var.labels
-
+resource "yandex_compute_instance" "this" {
+  name        = var.name
+  platform_id = var.platform_id
   resources {
-    cores         = var.cores
-    memory        = var.memory
-    core_fraction = var.core_fraction
+    cores  = var.resources.cores
+    memory = var.resources.memory
   }
-
   boot_disk {
-
     initialize_params {
-      image_id = "fd8n2m74r0s8s5f4c3k5"
-      size     = var.disk_size
+      image_id = var.image_id
     }
-
   }
-
   network_interface {
-
     subnet_id = var.subnet_id
     nat       = true
-
   }
-
-  metadata = {
-
-    user-data = var.user_data
-
-  }
-
+  metadata    = var.metadata
+  labels      = var.labels
+  preemptible = var.preemptible
 }
