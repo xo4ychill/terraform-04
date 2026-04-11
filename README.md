@@ -8,10 +8,12 @@
 ![alt text](images/1.1.png)
 ![alt text](images/1.1.2.png)
 - ```terraform console```
+
 ![alt text](images/1.2.png)
 
 ### Задание 2
 - ```terraform console```
+
 ![alt text](images/2.png)
 - [документация к модулю с помощью terraform-docs](src/modules/vpc/README.md)
 
