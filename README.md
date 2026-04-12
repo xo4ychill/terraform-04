@@ -36,8 +36,8 @@
 ![alt text](images/tr05-2.5.png)
 3. Коммит в ветку 'terraform-05' все изменения.
 ![alt text](images/tr05-2.8.png)
-5. Ответ об ошибке доступа к state (блокировка должна сработать автоматически)
-![alt text](tr05-2.6.png)
+5. Ответ об ошибке доступа к state (блокировка должна сработать автоматически).
+![alt text](images/tr05-2.6.png)
 6. Принудительная разблокировка state командой `terraform force-unlock <LOCK_ID>`
 ![alt text](images/tr05-2.7.png)
 
