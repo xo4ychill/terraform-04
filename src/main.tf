@@ -3,6 +3,7 @@
   required_providers {
     yandex = {
       source  = "yandex-cloud/yandex"
+      version = ">= 0.100"
     }
   }
 }
@@ -38,7 +39,7 @@ module "vpc" {
 
 # Генерация cloud-init с подстановкой SSH-ключа
 locals {
-  ssh_key_content = file(pathexpand(var.ssh_public_key))
+  ssh_key_content = var.ssh_public_key
   cloud_init_content = templatefile("${path.module}/cloud-init.yml.tpl", 
   {
     ssh_key = local.ssh_key_content
