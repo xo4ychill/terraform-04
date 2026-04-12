@@ -11,7 +11,7 @@
       - terraform_unused_declarations
       - terraform_module_pinned_source
 
-2. Проверка кода с помощью checkov (локальный запуск или через docker Checkov не может подключиться к API Prisma Cloud (api0.prismacloud.io) для загрузки маппингов и руководств)
+2. Проверка кода с помощью checkov (локальный запуск или через docker, Checkov не может подключиться к API Prisma Cloud (api0.prismacloud.io) для загрузки маппингов и руководств)
    - ```checkov -d .   --framework terraform   --download-external-modules true   -o json > checkov-report.json```
    - ```docker run --rm  -v "$(pwd):/tf" bridgecrew/checkov -d /tf  --download-external-modules true  -o json > checkov-report.json ```
 
