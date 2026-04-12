@@ -1,75 +1,84 @@
-/*terraform {
-  required_version = ">= 1.12.0"
-  required_providers {
-    yandex = {
-      source  = "yandex-cloud/yandex"
-      version = ">= 0.100"
-    }
-  }
-}
-
-provider "yandex" {
-  cloud_id  = var.cloud_id
-  folder_id = var.folder_id
-  zone      = var.default_zone
-  service_account_key_file = pathexpand(var.service_account_key_file)
-}
-
-
-# Получаем существующую VPC и подсеть по именам
-data "yandex_vpc_network" "develop" {
-  name = var.vpc_name
-}
-
-data "yandex_vpc_subnet" "develop" {
-  name = var.subnet_name
-}
-*/
-
-# Создаём сеть
-# Модуль VPC
+# --- VPC ---
 module "vpc" {
   source = "./modules/vpc"
 
   network_name   = var.vpc_name
   subnet_name    = var.subnet_name
   zone           = var.default_zone
-  v4_cidr_blocks = ["10.0.1.0/24"]
+  v4_cidr_blocks = var.v4_cidr_blocks
 }
 
-# Генерация cloud-init с подстановкой SSH-ключа
+# --- Security Group ---
+resource "yandex_vpc_security_group" "dev_sg" {
+  name        = "${var.vpc_name}-sg"
+  network_id  = module.vpc.network_id
+  description = "Security group"
+
+  ingress {
+    protocol       = "TCP"
+    port           = 22
+    v4_cidr_blocks = [var.allowed_ssh_cidr]
+  }
+
+  ingress {
+    protocol       = "TCP"
+    port           = 80
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    protocol       = "TCP"
+    port           = 443
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    protocol       = "ANY"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  labels = {
+    environment = var.environment
+  }
+}
+
+# --- Cloud-init ---
 locals {
   ssh_key_content = var.ssh_public_key
-  cloud_init_content = templatefile("${path.module}/cloud-init.yml.tpl", 
-  {
+
+  cloud_init_content = templatefile("${path.module}/cloud-init.yml.tpl", {
     ssh_key = local.ssh_key_content
   })
 }
 
-# Локальный модуль для ВМ marketing
+# --- Marketing VM ---
 module "marketing_vm" {
   source = "./modules/vm"
 
-  vm_name       = "vm-marketing"
-  project_label = "marketing"
-  subnet_id     = module.vpc.subnet_id
+  vm_name            = "vm-marketing"
+  project_label      = "marketing"
+  subnet_id          = module.vpc.subnet_id
   cloud_init_content = local.cloud_init_content
-  zone          = var.default_zone
-  image_family  = var.image_family
-  ssh_public_key = local.ssh_key_content
-  preemptible   = true
+  zone               = var.default_zone
+  image_family       = var.image_family
+  ssh_public_key     = local.ssh_key_content
+  preemptible        = true
+
+  security_group_ids = [yandex_vpc_security_group.dev_sg.id]
 }
 
-# Локальный модуль для ВМ analytics
+# --- Analytics VM ---
 module "analytics_vm" {
   source = "./modules/vm"
 
-  vm_name       = "vm-analytics"
-  project_label = "analytics"
-  subnet_id     = module.vpc.subnet_id
+  vm_name            = "vm-analytics"
+  project_label      = "analytics"
+  subnet_id          = module.vpc.subnet_id
   cloud_init_content = local.cloud_init_content
-  zone          = var.default_zone
-  image_family  = var.image_family
-  ssh_public_key = local.ssh_key_content
-  preemptible   = true
+  zone               = var.default_zone
+  image_family       = var.image_family
+  ssh_public_key     = local.ssh_key_content
+  preemptible        = true
+
+  security_group_ids = [yandex_vpc_security_group.dev_sg.id]
 }
