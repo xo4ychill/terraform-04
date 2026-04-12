@@ -45,3 +45,6 @@
 [Ссылка на PR для ревью](https://github.com/xo4ychill/terraform-04/pull/5)
 
 ### Задание 4
+- Скриншоты проверок из terraform console
+![alt text](images/tr05-4.png)
+![alt text](images/tr05-4.1.png)
