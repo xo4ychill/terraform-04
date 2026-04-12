@@ -45,10 +45,11 @@ variable "environment" {
   type = string
 }
 
-# Переменная 1: одиночный IP-адрес
+# Переменная для тестирования IP-адреса
 variable "single_ip" {
   description = "IP-адрес"
   type        = string
+  default     = "192.168.0.1"  # корректный для первого теста
 
   validation {
     condition     = can(regex("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", var.single_ip))
@@ -56,10 +57,11 @@ variable "single_ip" {
   }
 }
 
-# Переменная 2: список IP-адресов
+# Переменная для тестирования списка IP-адресов
 variable "ip_list" {
   description = "Список IP-адресов"
   type        = list(string)
+  default     = ["192.168.0.1", "1.1.1.1", "127.0.0.1"]
 
   validation {
     condition = alltrue([
