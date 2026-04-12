@@ -32,6 +32,7 @@ override.tf.json
 *.pub
 *.pfx
 *.p12
+*.key
 
 # SSH keys
 id_rsa
