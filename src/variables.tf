@@ -48,3 +48,17 @@ variable "subnet_name" {
   type        = string
   default     = "develop"
 }
+
+variable "ip_address" {
+  type        = string
+  description = "ip-адрес"
+
+  validation {
+    condition = can(regex(
+      "^(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\\.(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\\.(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\\.(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})$",
+      var.ip_address
+    ))
+
+    error_message = "Invalid IP address format"
+  }
+}
