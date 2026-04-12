@@ -23,7 +23,7 @@
 
 ### Задание 2
 1. Создаем ветку 'terraform-05' в ветке 'terraform-04'
-![alt text](../Terraform-05/images/tr05-2.png)
+![alt text](images/tr05-2.png)
 2. Настраиваем remote state с встроенными блокировками:
     - S3 bucket в Yandex Cloud для хранения state
 ![alt text](images/tr05-2.1.png)
