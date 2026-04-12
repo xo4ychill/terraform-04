@@ -1,4 +1,4 @@
-terraform {
+/*terraform {
   required_version = ">= 1.12.0"
   required_providers {
     yandex = {
@@ -14,7 +14,7 @@ provider "yandex" {
   service_account_key_file = pathexpand(var.service_account_key_file)
 }
 
-/*
+
 # Получаем существующую VPC и подсеть по именам
 data "yandex_vpc_network" "develop" {
   name = var.vpc_name
