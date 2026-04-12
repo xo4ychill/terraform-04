@@ -11,7 +11,7 @@ terraform {
 
   #  Remote state в Yandex Object Storage (S3-совместимый backend)
   backend "s3" {
-    bucket = "tf.state-bucket"   # имя твоего bucket (уникальное!)
+    bucket = "tf.state-bucket"   # имя bucket (уникальное!)
     key    = "terraform.tfstate"        # путь к state внутри bucket
     region = "ru-central1"
 
