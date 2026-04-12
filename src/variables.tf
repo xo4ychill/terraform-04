@@ -49,16 +49,26 @@ variable "subnet_name" {
   default     = "develop"
 }
 
-variable "ip_address" {
+# Переменная 1: одиночный IP-адрес
+variable "single_ip" {
+  description = "IP-адрес"
   type        = string
-  description = "ip-адрес"
 
   validation {
-    condition = can(regex(
-      "^(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\\.(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\\.(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\\.(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})$",
-      var.ip_address
-    ))
+    condition     = can(regex("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", var.single_ip))
+    error_message = "Invalid IP address format. Must be a valid IPv4 address (e.g., 192.168.0.1)."
+  }
+}
 
-    error_message = "Invalid IP address format"
+# Переменная 2: список IP-адресов
+variable "ip_list" {
+  description = "Список IP-адресов"
+  type        = list(string)
+
+  validation {
+    condition = alltrue([
+      for ip in var.ip_list : can(regex("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", ip))
+    ])
+    error_message = "All items in the list must be valid IPv4 addresses."
   }
 }
