@@ -1,3 +1,10 @@
+/*variable "token" {
+  type        = string
+  sensitive   = true
+  description = "Yandex Cloud OAuth token"
+}
+*/
+
 variable "cloud_id" {
   description = "ID облака Yandex Cloud"
   type        = string
