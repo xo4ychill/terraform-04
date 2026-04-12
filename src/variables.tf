@@ -45,28 +45,25 @@ variable "environment" {
   type = string
 }
 
-# Переменная для тестирования IP-адреса
+# ==================== ВАЛИДАЦИЯ IP-АДРЕСОВ ====================
 variable "single_ip" {
-  description = "IP-адрес"
+  description = "ip-адрес"
   type        = string
-  default     = "192.168.0.1"  # корректный для первого теста
 
   validation {
     condition     = can(regex("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", var.single_ip))
-    error_message = "Invalid IP address format. Must be a valid IPv4 address (e.g., 192.168.0.1)."
+    error_message = "Значение должно быть корректным IPv4-адресом. Пример: 192.168.0.1"
   }
 }
 
-# Переменная для тестирования списка IP-адресов
 variable "ip_list" {
-  description = "Список IP-адресов"
+  description = "список ip-адресов"
   type        = list(string)
-  default     = ["192.168.0.1", "1.1.1.1", "127.0.0.1"]
 
   validation {
     condition = alltrue([
       for ip in var.ip_list : can(regex("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", ip))
     ])
-    error_message = "All items in the list must be valid IPv4 addresses."
+    error_message = "Все элементы списка должны быть корректными IPv4-адресами. Пример: ['192.168.0.1', '1.1.1.1']"
   }
 }
